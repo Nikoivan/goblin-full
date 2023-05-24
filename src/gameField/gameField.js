@@ -2,17 +2,8 @@ import Goblin from "../goblin/goblin";
 
 class GameField {
   constructor() {
-    const field = document.createElement("ul");
-    field.classList.add("field");
-    for (let i = 0; i < 16; i += 1) {
-      const cell = document.createElement("li");
-      cell.classList.add("cell");
-      cell.dataset.id = i;
-      cell.appendChild(document.createElement("a"));
-      field.appendChild(cell);
-    }
-    this.field = document.querySelector("body").appendChild(field);
-    this.goblin = new Goblin();
+    this.field = document.querySelector(".field");
+    this.goblin = null;
   }
 
   start() {
@@ -23,50 +14,44 @@ class GameField {
 
   stop() {
     clearInterval(this.intervalId);
-    // переделать на правильное
-    document.querySelector(".goblin").remove();
+
+    this.goblin.element.remove();
+    this.goblin = null;
   }
 
   addGoblin(id) {
-    const target = [...this.field.children].find((el) => +el.dataset.id === id);
-    target.appendChild(this.goblin.goblin);
+    this.goblin = new Goblin();
+    const target = this.field.children[id];
+
+    target.append(this.goblin.goblin);
   }
 
   generateId() {
-    const oldGoblin = this.field.querySelector(".goblin");
-    if (oldGoblin) {
-      const oldId = oldGoblin.closest(".cell").dataset.id;
-      let positions = [];
-      for (let i = 0; i < this.field.children.length; i += 1) {
-        positions.push(i);
+    let positions = [];
+    for (let i = 0; i < this.field.children.length; i += 1) {
+      if (!this.field.children[i].querySelector(".goblin")) {
+        positions.push(this.field.children[i].dataset.id);
       }
-      positions = positions.filter((el) => el !== oldId);
-      return {
-        oldGoblin,
-        id: positions[Math.floor(Math.random() * positions.length)],
-      };
-    } else {
-      return {
-        oldGoblin: null,
-        id: Math.floor(Math.random() * this.field.children.length),
-      };
     }
+
+    return positions[Math.floor(Math.random() * positions.length)];
   }
 
-  reAddGoblin(oldGoblin, id) {
-    const newCell = [...this.field.children].find(
-      (el) => +el.dataset.id === id
-    );
+  reAddGoblin(id) {
+    const oldId = this.goblin.element.closest(".cell").dataset.id;
+    const newCell = this.field.children[id];
     const a = newCell.querySelector("a");
-    const noGoblin = newCell.replaceChild(oldGoblin, a);
-    oldGoblin.closest(".cell").appendChild(noGoblin);
+    const newA = document.createElement("a");
+
+    a.replaceWith(this.goblin.element);
+    this.field.children[oldId].append(newA);
   }
 
   setGoblin() {
-    const { oldGoblin, id } = this.generateId();
+    const id = this.generateId();
 
-    if (oldGoblin) {
-      this.reAddGoblin(oldGoblin, id);
+    if (this.goblin) {
+      this.reAddGoblin(id);
     } else {
       this.addGoblin(id);
     }
