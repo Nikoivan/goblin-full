@@ -1,9 +1,7 @@
-import GameField from "../gameField/gameField";
-import Statistic from "../statistic/statistic";
-
 export default class GameController {
-  constructor() {
-    this.gameField = new GameField();
+  constructor(fieldType, enemyType, statType) {
+    this.gameField = new fieldType(enemyType);
+    this.statType = statType;
 
     this.onCellClick = this.onCellClick.bind(this);
     this.onStartGame = this.onStartGame.bind(this);
@@ -16,13 +14,14 @@ export default class GameController {
 
   onStartGame() {
     this.startGameState = true;
-    this.statistic = new Statistic();
-    this.gameField.start();
+    this.statistic = new this.statType(document.querySelector(".statistic"));
+    this.gameField.start(this.enemy);
   }
 
   onCellClick(e) {
     if (this.startGameState) {
       if (e.target.closest(".goblin")) {
+        this.gameField.deleteGoblin(e.target.closest(".cell").dataset.id);
         this.statistic.addHit();
       } else {
         this.statistic.addMiss();

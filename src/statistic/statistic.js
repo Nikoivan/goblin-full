@@ -1,6 +1,6 @@
 export default class Statistic {
-  constructor() {
-    this.stat = document.querySelector(".statistic");
+  constructor(blockName) {
+    this.stat = blockName;
     this.hitsNumber = 0;
     this.missesNumber = 0;
 

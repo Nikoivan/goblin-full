@@ -1,9 +1,9 @@
-import Goblin from "../goblin/goblin";
-
 class GameField {
-  constructor() {
+  constructor(enemy) {
     this.field = document.querySelector(".field");
-    this.goblin = null;
+    this.enemyType = enemy;
+    this.positions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15];
+    this.enemyPosition = null;
   }
 
   start() {
@@ -15,25 +15,28 @@ class GameField {
   stop() {
     clearInterval(this.intervalId);
 
-    this.goblin.element.remove();
+    if (this.goblin) {
+      this.goblin.deleteGoblin();
+    }
+
     this.goblin = null;
   }
 
   addGoblin(id) {
-    this.goblin = new Goblin();
+    this.goblin = new this.enemyType();
     const target = this.field.children[id];
+    this.enemyPosition = id;
 
     target.append(this.goblin.goblin);
   }
 
-  generateId() {
-    let positions = [];
-    for (let i = 0; i < this.field.children.length; i += 1) {
-      if (!this.field.children[i].querySelector(".goblin")) {
-        positions.push(this.field.children[i].dataset.id);
-      }
-    }
+  deleteGoblin() {
+    this.goblin.deleteGoblin();
+    this.goblin = null;
+  }
 
+  generateId() {
+    let positions = this.positions.filter((el) => el !== this.enemyPosition);
     return positions[Math.floor(Math.random() * positions.length)];
   }
 

@@ -11,4 +11,8 @@ export default class Goblin {
   get goblin() {
     return this.element;
   }
+
+  deleteGoblin() {
+    this.element.remove();
+  }
 }
